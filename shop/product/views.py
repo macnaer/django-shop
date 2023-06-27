@@ -1,5 +1,6 @@
 from django.shortcuts import render, get_object_or_404
 from . models import Product, Category
+from django.core.paginator import Paginator
 from functools import wraps
 from users.models import CustomUser, Order_basket
 
@@ -13,8 +14,14 @@ def context_data(func):
         categories = Category.objects.order_by('name')
         user = CustomUser.objects.order_by('username')
         user_id = Order_basket.objects.order_by('id')
+
+        paginator = Paginator(products, 2)
+        print(f"paginator {paginator}")
+        page_number = request.GET.get('page')
+        page = paginator.get_page(page_number)
+
         context = {
-            "products": products,
+            "products": page,
             'categories': categories,
             'users': user,
             'user_id':user_id,
