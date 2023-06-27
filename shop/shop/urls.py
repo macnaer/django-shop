@@ -8,6 +8,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.index, name='index'),
     path('shop/', views.shop, name='shop'),
+    # path('<int:product_id>/', views.shop, name='shop'),
     path('checkout/', views.checkout, name='checkout'),
     path('contact/', views.contact, name='contact'),
     path('category/<int:category_id>/',
