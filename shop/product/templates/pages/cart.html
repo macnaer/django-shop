@@ -1,36 +1,4 @@
 {% extends 'base.html' %} {% block content %}
-{% comment %} {% if user %}
-<h1>User ID: {{ user.id }}</h1>
-{% for user_id in user_id %}
-<h1>User ID from user_id: {{ user_id.user_id }}</h1>
-{%endfor%}
-{% endif %} {% endcomment %}
-
-{% comment %} {% if user %}
-   <h1>User ID: {{ user.id }}</h1> 
-  {% for user_id in user_id %}
-     <h1>User ID from user_id: {{ user_id }}</h1> 
-    {% if user.id == user_id.user_id %}
-      <p>{{ user.id }}</p>
-      <p>{{ user_id.user_id }}</p>
-    {% else %}
-      <p>ВИВОДИТЬ ЛИШНЄ</p>
-    {% endif %}
-  {% endfor %}
-{% endif %} {% endcomment %}
-
-
-
-
-
-      
-
-
-
-
-
-
-
 
 <!-- Breadcrumb Start -->
 <div class="container-fluid">
@@ -113,18 +81,6 @@
       </table>
     </div>
     <div class="col-lg-4">
-      <form class="mb-30" action="">
-        <div class="input-group">
-          <input
-            type="text"
-            class="form-control border-0 p-4"
-            placeholder="Coupon Code"
-          />
-          <div class="input-group-append">
-            <button class="btn btn-primary">Apply Coupon</button>
-          </div>
-        </div>
-      </form>
       <h5 class="section-title position-relative text-uppercase mb-3">
         <span class="bg-secondary pr-3">Cart Summary</span>
       </h5>

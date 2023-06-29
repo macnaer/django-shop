@@ -16,7 +16,6 @@ from email.message import EmailMessage
 import smtplib
 from django.contrib.auth.decorators import login_required
 from .forms import UserEditForm
-from users.models import Order_basket
 
 
 
@@ -148,27 +147,3 @@ def seller_profile(request, id):
     }
 
     return render(request, 'users/sellerprofile.html', context)
-
-
-
-def add_to_cart(request):
-    # Отримати необхідні дані з запиту POST
-    user_id = request.POST.get('user_id')
-    product_id = request.POST.get('product_id')
-
-    # Отримати екземпляр CustomUser за допомогою ідентифікатора
-    CustomUser = get_user_model()
-    user = CustomUser.objects.get(id=user_id)
-
-    # Зберегти дані у таблиці Order
-    order = Order_basket(user=user, product_id=product_id)
-    order.save()
-
-    # Перенаправити користувача до іншої сторінки
-    return redirect('/cart/')
-
-
-
-
-
-

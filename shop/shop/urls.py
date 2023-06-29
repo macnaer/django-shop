@@ -8,13 +8,13 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.index, name='index'),
     path('shop/', views.shop, name='shop'),
-    # path('<int:product_id>/', views.shop, name='shop'),
+
     path('checkout/', views.checkout, name='checkout'),
     path('contact/', views.contact, name='contact'),
     path('category/<int:category_id>/',
          views.products_by_category, name='products_by_category'),
     path('detail/<int:product_id>/', views.detail, name='detail'),
     path('cart/', views.cart, name='cart'),
-    path('products/', include('product.urls')),
+    path('products/', include(('product.urls', 'products'), namespace='products')),
     path('users/', include('users.urls'), name='users'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -1,5 +1,5 @@
 from django.db import models
-
+from users.models import CustomUser
 from django.shortcuts import render
 from django.db.models.signals import post_migrate
 from django.dispatch import receiver
@@ -20,13 +20,12 @@ class Category(models.Model):
     name = models.CharField(max_length=100)
     description = models.CharField(max_length=100)
     photo_0 = models.ImageField(upload_to="photos/%Y/%m/%d/")
-    
+
     def __str__(self):
         return self.name
 
 
 class Product(models.Model):
-
     class Meta:
         db_table = "products"
     name = models.CharField(max_length=100)
@@ -40,43 +39,54 @@ class Product(models.Model):
     photo_3 = models.ImageField(upload_to="photos/%Y/%m/%d/", blank=True)
 
 
-
 def __str__(self):
     return f"{self.name} {self.description} {self.price} {self.catedory}"
 
 
-# @receiver(post_migrate)
-# def populate_data(sender, **kwargs):
-#     if sender.name == 'shop':
-#         Category = apps.get_model('shop', 'Category')
-#         Product = apps.get_model('shop', 'Product')
-#         categories = [
-#             {'name': 'Category 1', 'description': 'Description 1'},
-#             {'name': 'Category 2', 'description': 'Description 2'},
-#             {'name': 'Category 3', 'description': 'Description 3'},
-#         ]
+# class Order(models.Model):
+#     class Meta:
+#         db_table = "orders"
+#     user = models.ForeignKey(
+#         CustomUser, on_delete=models.CASCADE, blank=True, null=True)
+#     product = models.ForeignKey(
+#         Product, on_delete=models.CASCADE, blank=True, null=True)
+#     quantity = models.PositiveIntegerField(default=1)
+#     total_price = models.PositiveIntegerField(default=1)
 
-#         for category_data in categories:
-#             category = Category(
-#                 name=category_data['name'], description=category_data['description'])
-#             category.save()
-#         category_objects = Category.objects.all()
 
-#         products = [
+class Basket(models.Model):
+    user = models.ForeignKey(
+        CustomUser, on_delete=models.CASCADE, blank=True, null=True)
+    product = models.ForeignKey(
+        Product, on_delete=models.CASCADE, blank=True, null=True)
+    quantity = models.PositiveIntegerField(default=0)
+    created_timestamp = models.DateTimeField(auto_now_add=True)
 
-#             {'name': 'Product 1', 'description': 'Description 1',
-#                 'price': 10.0, 'category': category_objects[0]},
-#             {'name': 'Product 2', 'description': 'Description 2',
-#                 'price': 20.0, 'category': category_objects[1]},
-#             {'name': 'Product 3', 'description': 'Description 3',
-#                 'price': 30.0, 'category': category_objects[2]},
-#         ]
+    def __str__(self):
+        return f'Basket for {self.user.username} | Product: {self.product.name}'
 
-#         for product_data in products:
-#             product = Product(
-#                 name=product_data['name'],
-#                 description=product_data['description'],
-#                 price=product_data['price'],
-#                 category=product_data['category']
-#             )
-#             product.save()
+    def sum(self):
+        return self.product.price * self.quantity
+
+    def get_json(self):
+        item = {
+            'product_name': self.product.name,
+            'quantity': self.quantity,
+            'price': float(self.product.price),
+            'sum': float(self.sum())
+        }
+        return item
+
+    @classmethod
+    def create_or_update(cls, product_id, user):
+        baskets = Basket.objects.filter(user=user, product_id=product_id)
+
+        if not baskets.exists():
+            obj = Basket.objects.create(
+                user=user, product_id=product_id, quantity=1)
+        else:
+            basket = baskets.first()
+            basket.quantity += 1
+            basket.save()
+            is_created = False
+            return basket, is_created
