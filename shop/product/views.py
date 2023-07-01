@@ -49,9 +49,15 @@ def contact(request, context):
 
 
 def cart(request):
+    baskets = Basket.objects.filter(user=request.user)
+    total_sum = 0
+
+    for basket in baskets:
+        total_sum += basket.sum()
 
     context = {
-        
+        'baskets': baskets,
+        'total_sum': total_sum,
     }
     return render(request, 'pages/cart.html', context)
 
@@ -92,3 +98,23 @@ def remove_from_card(request, basket_id):
     basket = Basket.objects.get(id=basket_id)
     basket.delete()
     return HttpResponseRedirect(request.META['HTTP_REFERER'])
+
+
+@login_required
+def increase_quantity(request, basket_id):
+    basket = Basket.objects.get(id=basket_id)
+    basket.quantity += 1
+    basket.save()
+    return HttpResponseRedirect(request.META['HTTP_REFERER'])
+
+
+@login_required
+def increase_quantity_minus(request, basket_id):
+    basket = Basket.objects.get(id=basket_id)
+    basket.quantity -= 1
+    if basket.quantity == 0:
+        basket.delete()
+        return HttpResponseRedirect(request.META['HTTP_REFERER'])
+    else:
+        basket.save()
+        return HttpResponseRedirect(request.META['HTTP_REFERER'])
